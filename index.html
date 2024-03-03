@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket Thing1</title>
+</head>
+<body>
+  
+    <button id="requestDeviceOrientation">Premission</button>
+</body>
+<script>
+    // Create WebSocket connection.
+    const socket = new WebSocket('ws://localhost:3000');
+
+    // Connection opened
+    socket.addEventListener('open', function (event) {
+        console.log('Connected to WS Server')
+    });
+
+    socket.addEventListener('message', function (event) {
+        if(event) console.log('Message from server ', isJSON(event.data));
+        function isJSON(str) {
+            try {
+                JSON.parse(str);
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+    });
+
+    const sendMessage = () => {
+        socket.send('Hello From Client1!');
+    }
+
+    document.getElementById('requestDeviceOrientation').addEventListener('click', async() =>{
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    try {
+                      const permissionState = await DeviceOrientationEvent.requestPermission()
+                      if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation)
+                      } else {
+                        alert('Permission was denied')
+                      }
+                    } catch (error) {
+                      alert(error)
+                    }
+                  } else if ('DeviceOrientationEvent' in window) {
+                    //non iOS 13+ devices
+                    console.log("not iOS");
+                    window.addEventListener('deviceorientation', handleOrientation)
+                  } else {
+                    //not supported
+                    alert('nicht unterstützt')
+                  }
+            })
+
+    function handleOrientation(event) {
+    
+        let alpha = event.alpha
+        let beta = event.beta
+        let gamma = event.gamma
+        
+        const orientationData = { alpha, beta, gamma };
+        socket.send(JSON.stringify(orientationData));
+    }
+    
+</script>
+</html>
