@@ -11,7 +11,7 @@
 
     <script>
       // Create WebSocket connection.
-      const socket = new WebSocket('ws:https://gyroscope-vision-pro.vercel.app/');
+      const socket = new WebSocket('ws://localhost:3000');
   
       // Connection opened
       socket.addEventListener('open', function (event) {
@@ -19,6 +19,7 @@
       });
   
       socket.addEventListener('message', function (event) {
+        alert('yes')
           if(event) console.log('Message from server ', isJSON(event.data));
           function isJSON(str) {
               try {
@@ -35,7 +36,6 @@
       }
   
       document.getElementById('requestDeviceOrientation').addEventListener('click', async() =>{
-        alert('clicked')
                   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                       try {
                         const permissionState = await DeviceOrientationEvent.requestPermission()
